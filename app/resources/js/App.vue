@@ -52,37 +52,20 @@ const formatData = (apiData) => {
 // format the data from the api in a way that is easier
 // to work with for our chart
 const getFormattedMedicalData = (apiData) => {
+    const fields = {
+        oCount: 0,
+        fCount: 0,
+        totalServiceCount: 0,
+        averageSubmittedCharges: 0,
+        averageMedicarePayments: 0
+    }
+
     const medicalData = {
-        11043: {
-            oCount: 0,
-            fCount: 0,
-            averageSubmittedCharges: 0,
-            averageMedicarePayments: 0
-        },
-        11044: {
-            oCount: 0,
-            fCount: 0,
-            averageSubmittedCharges: 0,
-            averageMedicarePayments: 0
-        },
-        11045: {
-            oCount: 0,
-            fCount: 0,
-            averageSubmittedCharges: 0,
-            averageMedicarePayments: 0
-        },
-        11046: {
-            oCount: 0,
-            fCount: 0,
-            averageSubmittedCharges: 0,
-            averageMedicarePayments: 0
-        },
-        11047: {
-            oCount: 0,
-            fCount: 0,
-            averageSubmittedCharges: 0,
-            averageMedicarePayments: 0
-        }
+        11043: {...fields},
+        11044: {...fields},
+        11045: {...fields},
+        11046: {...fields},
+        11047: {...fields}
     }
 
     // populate medicalData with the values we care about from the api
@@ -93,6 +76,8 @@ const getFormattedMedicalData = (apiData) => {
         } else {
             medicalData[record[3]].oCount = parseInt(record[9]);
         }
+
+        medicalData[record[3]].totalServiceCount += parseInt(record[9]);
         medicalData[record[3]].averageSubmittedCharges += parseFloat(record[11]);
         medicalData[record[3]].averageMedicarePayments += parseFloat(record[13]);
     });
@@ -109,8 +94,7 @@ const getFormattedChartData = (medicalData) => {
     }
 
     for(let key in medicalData) {
-        // combine place_of_service (F/O) for simplicity, may show individually in future
-        dataSet.numServicesDone.push(medicalData[key].fCount + medicalData[key].oCount);
+        dataSet.numServicesDone.push(medicalData[key].totalServiceCount);
         dataSet.submittedCharges.push(medicalData[key].averageSubmittedCharges);
         dataSet.medicarePayments.push(medicalData[key].averageMedicarePayments);
     }
@@ -120,12 +104,12 @@ const getFormattedChartData = (medicalData) => {
 </script>
 
 <template>
-   <h1 class="main-header">Medicare Services for Diabetic Foot Ulcer Debridements by State in 2021</h1>
-   <p class="data-source">*All data provided by the
+    <h1 class="main-header">Medicare Services for Diabetic Foot Ulcer Debridements by State in 2021</h1>
+    <p class="data-source">*All data provided by the
         <a :href="apiSourceLink" target="_blank" class="link">CMS API</a>
     </p>
-   <ChartControl @filter-change-state="filterDataByState" />
-   <Chart :chartData="chartData" :isLoaded="isLoaded" />
+    <ChartControl @filter-change-state="filterDataByState" />
+    <Chart :chartData="chartData" :isLoaded="isLoaded" />
 </template>
 
 <style scoped>
